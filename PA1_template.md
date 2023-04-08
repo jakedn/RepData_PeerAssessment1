@@ -10,11 +10,11 @@ editor_options:
 
 ## Loading and preprocessing the data
 
-```{r load_data, echo=TRUE}
+
+```r
 activity_data <- read.csv("./activity.csv")
 activity_data[, "date"] <- as.Date(activity_data$date)
 activity_data_no_na <- activity_data[ ( !is.na(activity_data$steps) ), ]
-
 ```
 
 ## What is mean total number of steps taken per day?
@@ -22,7 +22,8 @@ activity_data_no_na <- activity_data[ ( !is.na(activity_data$steps) ), ]
 First we will show the frequincies of the total steps taken in a one day
 period.
 
-```{r totals, echo=TRUE}
+
+```r
 tots <- tapply(activity_data_no_na$steps, 
                activity_data_no_na$date, 
                function(x) sum(x, na.rm = TRUE)
@@ -30,12 +31,25 @@ tots <- tapply(activity_data_no_na$steps,
 hist(tots, xlab = "total steps during one day", main = "Histogram Of Total Steps Per Day")
 ```
 
+![](PA1_template_files/figure-html/totals-1.png)<!-- -->
+
 Now we will calculate the mean and median of the totals respectivly.
 
-```{r mean_totals, echo=TRUE}
 
+```r
 mean(tots)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(tots)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -43,7 +57,8 @@ median(tots)
 Here we are calculating the average value for each 5 minute interval and
 we will plot it onto a graph.
 
-```{r intervals, echo=TRUE}
+
+```r
 averages <- tapply(activity_data_no_na$steps, 
                activity_data_no_na$interval, 
                function(x) mean(x, na.rm = TRUE)
@@ -53,11 +68,18 @@ plot(names(averages), averages,
      type = "l", xlab = "5-minute intervals", ylab = "average steps")
 ```
 
+![](PA1_template_files/figure-html/intervals-1.png)<!-- -->
+
 We can see that the interval with the most steps is around 800 to be
 sure lets calculate it below.
 
-```{r max_interval, echo=TRUE}
+
+```r
 names(averages)[which.max(averages)]
+```
+
+```
+## [1] "835"
 ```
 
 Man i was close! This interval is 8:35am seems like people like morning
@@ -68,8 +90,13 @@ runs.
 We have a few missing values in our dataset we can calculate the exact
 amount:
 
-```{r NAs, echo=TRUE}
+
+```r
 sum(is.na(activity_data$steps))
+```
+
+```
+## [1] 2304
 ```
 
 That is a decent amount of missing data lets see what we can do about
@@ -82,7 +109,8 @@ that is hidden; ex: lets say \> we don't have values for a sunday and we
 use interval values calculated \> mostly from workdays then did we just
 overide the real weekend values??
 
-```{r subsitute, echo=TRUE}
+
+```r
 #TODO can i get away without a loop come back to this.
 filled_activity <- activity_data
 for ( i in 1:length(activity_data$steps) ) {
@@ -94,15 +122,31 @@ for ( i in 1:length(activity_data$steps) ) {
 
 Lets see how we affected the mean and median by subsituting the NAs.
 
-```{r retotals, echo=TRUE}
+
+```r
 tots <- tapply(filled_activity$steps, 
                filled_activity$date, 
                function(x) sum(x, na.rm = TRUE)
                )
 hist(tots, xlab = "total steps during one day", main = "Histogram Of Total Steps Per Day")
+```
 
+![](PA1_template_files/figure-html/retotals-1.png)<!-- -->
+
+```r
 mean(tots)
+```
+
+```
+## [1] 10765.64
+```
+
+```r
 median(tots)
+```
+
+```
+## [1] 10762
 ```
 
 As we can see the results don't really differ from the prior results.
@@ -113,7 +157,8 @@ from entire days only?)
 between weekdays and weekends? Lastley lets see if we can tell whether
 people are more active during the week or the weekends.
 
-```{r weekday_v_weekend, echo=TRUE}
+
+```r
 library(lattice)
 days = factor(c("weekday", "weekend"))
 filled_activity[, "isWeekend"] <- days[
@@ -131,7 +176,11 @@ xyplot( average_steps ~ interval | isWeekend,
         layout = c(1, 2), type = "l", 
         ylab = "Number of steps"
         )
+```
 
+![](PA1_template_files/figure-html/weekday_v_weekend-1.png)<!-- -->
+
+```r
 #TODO
 # why couldnt i write 
 #xyplot( Mean ~ interval | days, weekday_averages, layout = c(1, 2), type = "l")
